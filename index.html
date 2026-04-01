@@ -92,10 +92,7 @@
 
                 <div class="px-10">
                     <div id="scenario" class="text-3xl font-medium leading-tight min-h-[120px] mb-10"></div>
-
-                    <div id="answers" class="space-y-4">
-                        <!-- JS populated -->
-                    </div>
+                    <div id="answers" class="space-y-4"></div>
                 </div>
 
                 <div class="px-10 py-8 border-t border-white/10 mt-12 flex justify-between items-center bg-black/30">
@@ -114,7 +111,7 @@
 
                 <!-- Main Persona Section -->
                 <div id="main-persona" class="bg-gradient-to-br from-white/10 to-transparent border border-white/30 rounded-3xl p-8 mb-12">
-                    <!-- Dynamically populated -->
+                    <!-- Dynamically populated by JS -->
                 </div>
 
                 <!-- Breakdown -->
@@ -132,13 +129,14 @@
                 </div>
 
                 <!-- Disclaimer -->
-                <div class="text-center">
+                <div class="text-center mb-8">
                     <p class="text-xs text-white/40 max-w-2xl mx-auto">
                         Disclaimer: This interactive tool is a non-commercial fan project. Starfield, its factions, and the original quiz content are trademarks and copyright of Bethesda Softworks and ZeniMax Media. No challenge to ownership is intended.
                     </p>
                 </div>
 
-                <div class="flex gap-4 mt-12">
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4">
                     <button onclick="restartQuiz()" 
                             class="flex-1 py-6 rounded-3xl border border-white/40 hover:border-white text-lg font-semibold transition-colors">
                         RETAKE QUIZ
@@ -226,14 +224,14 @@
                     { letter: "D", text: "A feared and respected force in the galaxy." }
                 ]
             }
-        ]
+        ];
 
         const factions = {
             A: { name: "Constellation", emoji: "🔭", short: "Constellation" },
             B: { name: "United Colonies Vanguard", emoji: "🛡️", short: "UC Vanguard" },
             C: { name: "Freestar Collective", emoji: "🤠", short: "Freestar Collective" },
             D: { name: "Crimson Fleet", emoji: "🏴‍☠️", short: "Crimson Fleet" }
-        }
+        };
 
         const combinations = {
             "A+B": { persona: "The Explorer-Soldier", description: "You believe that humanity’s future in the stars must be protected by a steady hand. You aren't just out there for the science; you're the one making sure the frontier stays safe for everyone else. You value order, but only if it serves the greater mystery." },
@@ -242,125 +240,107 @@
             "A+D": { persona: "The Rogue Scholar", description: "You follow the \"find-and-keep\" rule. You’re driven by an insatiable curiosity, but you have zero interest in following the laws of those who didn't do the work. To you, the artifacts and the loot are one and the same—valuable, rare, and rightfully yours." },
             "B+D": { persona: "The Enforcer", description: "You understand power better than anyone else. Whether you’re wearing a uniform or a pirate’s jacket, you know that might makes right. You likely have a \"results at any cost\" mentality, making you a dangerous ally and an even worse enemy." },
             "C+D": { persona: "The Outlaw Hero", description: "You are the ultimate individualist. You view the United Colonies as an overbearing parent and would rather live dangerously in the \"Wild West\" of space. You might break the law, but you have a personal code of honor that the bureaucrats in New Atlantis could never understand." }
-        }
+        };
 
         const originalDescriptions = {
             A: "People who chose mostly A tend to be curious scientists and explorers at heart. They prioritize discovery, knowledge, and pushing the boundaries of what we know about the universe. You are drawn to the unknown and thrive on uncovering the mysteries of the stars.",
             B: "People who chose mostly B are disciplined and principled. They believe in following rules, protecting the collective, and maintaining order across the Settled Systems. Duty and structure guide your decisions as you help build a safer future for humanity.",
             C: "People who chose mostly C value independence and practicality. They embody the rugged frontier spirit – freedom, self-reliance, and doing what needs to be done without unnecessary interference. You carve your own path among the stars.",
             D: "People who chose mostly D are bold and opportunistic. They thrive on risk, personal power, and bending situations to their advantage, often with a pirate's cunning. You live by your own code and seize every opportunity the galaxy offers."
-        }
+        };
 
-        const neutralDescription = "You are a true neutral captain — balanced across all philosophies of the Settled Systems. No single faction fully defines you. You adapt to the situation, drawing from exploration, duty, freedom, and survival as needed. This flexibility makes you unpredictable, versatile, and dangerous in your own way. The galaxy is your playground, and you play by your own ever-changing rules."
+        const neutralDescription = "You are a true neutral captain — balanced across all philosophies of the Settled Systems. No single faction fully defines you. You adapt to the situation, drawing from exploration, duty, freedom, and survival as needed. This flexibility makes you unpredictable, versatile, and dangerous in your own way. The galaxy is your playground, and you play by your own ever-changing rules.";
 
-        let currentIndex = 0
-        let answersSelected = [] // 1=A, 2=B, 3=C, 4=D
+        let currentIndex = 0;
+        let answersSelected = [];
 
         function startQuiz() {
-            document.getElementById('intro').classList.add('hidden')
-            document.getElementById('quiz').classList.remove('hidden')
-            currentIndex = 0
-            answersSelected = new Array(scenarios.length).fill(0)
-            loadScenario()
+            document.getElementById('intro').classList.add('hidden');
+            document.getElementById('quiz').classList.remove('hidden');
+            currentIndex = 0;
+            answersSelected = new Array(scenarios.length).fill(0);
+            loadScenario();
         }
 
         function loadScenario() {
-            const scenario = scenarios[currentIndex]
+            const scenario = scenarios[currentIndex];
+            document.getElementById('q-num').textContent = currentIndex + 1;
+            document.getElementById('scenario').innerHTML = `<span class="text-cyan-400">Scenario ${currentIndex + 1}:</span> ${scenario.text}`;
             
-            document.getElementById('q-num').textContent = currentIndex + 1
-            document.getElementById('scenario').innerHTML = `<span class="text-cyan-400">Scenario ${currentIndex + 1}:</span> ${scenario.text}`
-            
-            const container = document.getElementById('answers')
-            container.innerHTML = ''
+            const container = document.getElementById('answers');
+            container.innerHTML = '';
             
             scenario.answers.forEach(ans => {
-                const value = ans.letter.charCodeAt(0) - 64
-                
-                const div = document.createElement('div')
-                div.className = `option cursor-pointer border border-white/30 bg-white/5 hover:bg-white/10 rounded-3xl p-6 flex items-center gap-6 text-xl`
-                if (answersSelected[currentIndex] === value) div.classList.add('selected')
+                const value = ans.letter.charCodeAt(0) - 64;
+                const div = document.createElement('div');
+                div.className = `option cursor-pointer border border-white/30 bg-white/5 hover:bg-white/10 rounded-3xl p-6 flex items-center gap-6 text-xl`;
+                if (answersSelected[currentIndex] === value) div.classList.add('selected');
                 
                 div.innerHTML = `
                     <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center text-3xl font-bold text-cyan-300">${ans.letter}</div>
                     <div class="flex-1">${ans.text}</div>
-                `
+                `;
                 div.onclick = () => {
-                    answersSelected[currentIndex] = value
+                    answersSelected[currentIndex] = value;
                     setTimeout(() => {
                         if (currentIndex < scenarios.length - 1) {
-                            currentIndex++
-                            loadScenario()
+                            currentIndex++;
+                            loadScenario();
                         } else {
-                            showResults()
+                            showResults();
                         }
-                    }, 280)
-                }
-                container.appendChild(div)
-            })
+                    }, 280);
+                };
+                container.appendChild(div);
+            });
             
-            const progress = ((currentIndex) / scenarios.length) * 100
-            document.getElementById('progress').style.width = `${progress}%`
+            const progress = ((currentIndex) / scenarios.length) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
         }
 
         function prevQuestion() {
             if (currentIndex > 0) {
-                currentIndex--
-                loadScenario()
+                currentIndex--;
+                loadScenario();
             }
         }
 
         function getLetterCounts() {
-            const counts = {A:0, B:0, C:0, D:0}
+            const counts = {A:0, B:0, C:0, D:0};
             answersSelected.forEach(val => {
                 if (val >= 1 && val <= 4) {
-                    const letter = String.fromCharCode(64 + val)
-                    counts[letter]++
+                    const letter = String.fromCharCode(64 + val);
+                    counts[letter]++;
                 }
-            })
-            return counts
+            });
+            return counts;
         }
 
         function showResults() {
-            document.getElementById('quiz').classList.add('hidden')
-            document.getElementById('results').classList.remove('hidden')
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
             
-            const counts = getLetterCounts()
-            const sortedCounts = Object.entries(counts).sort((a, b) => b[1] - a[1])
+            const counts = getLetterCounts();
+            const sortedCounts = Object.entries(counts).sort((a, b) => b[1] - a[1]);
             
-            let mainHTML = ''
-            let subtitle = ''
-            let descriptionText = ''
-            
-            const maxCount = sortedCounts[0][1]
-            const secondCount = sortedCounts[1][1]
-            
-            // True neutral: exactly 2 each
+            let mainHTML = '', subtitle = '', descriptionText = '';
+            const maxCount = sortedCounts[0][1];
+            const secondCount = sortedCounts[1][1];
+
             if (counts.A === 2 && counts.B === 2 && counts.C === 2 && counts.D === 2) {
-                mainHTML = `
-                    <div class="text-center">
-                        <div class="text-7xl mb-6">🌌</div>
-                        <div class="title-font text-5xl mb-3">The True Neutral</div>
-                        <div class="text-cyan-300 text-xl">A Balanced Captain of the Settled Systems</div>
-                    </div>
-                `
-                subtitle = "Your choices show perfect balance across every faction"
-                descriptionText = neutralDescription
-            }
-            // Clear single winner (max > second)
-            else if (maxCount > secondCount) {
-                const topLetter = sortedCounts[0][0]
-                const f = factions[topLetter]
-                
-                // Check for two tied for second
-                const seconds = sortedCounts.slice(1).filter(([_, c]) => c === secondCount)
-                const hasTiedSecond = seconds.length >= 2 && seconds.length === 2
-                
+                mainHTML = `<div class="text-center"><div class="text-7xl mb-6">🌌</div><div class="title-font text-5xl mb-3">The True Neutral</div><div class="text-cyan-300 text-xl">A Balanced Captain of the Settled Systems</div></div>`;
+                subtitle = "Your choices show perfect balance across every faction";
+                descriptionText = neutralDescription;
+            } else if (maxCount > secondCount) {
+                const topLetter = sortedCounts[0][0];
+                const f = factions[topLetter];
+                const seconds = sortedCounts.slice(1).filter(([_, c]) => c === secondCount);
+                const hasTiedSecond = seconds.length === 2;
+
                 if (hasTiedSecond) {
-                    // Primary + two tied secondary motivations
-                    const sec1 = seconds[0][0]
-                    const sec2 = seconds[1][0]
-                    const comboKey = [topLetter, sec1].sort().join('+')
-                    const combo = combinations[comboKey] || combinations[[topLetter, sec2].sort().join('+')]
+                    const sec1 = seconds[0][0], sec2 = seconds[1][0];
+                    const comboKey = [topLetter, sec1].sort().join('+');
+                    const combo = combinations[comboKey] || combinations[[topLetter, sec2].sort().join('+')];
                     
                     mainHTML = `
                         <div class="flex gap-8 items-start">
@@ -385,11 +365,10 @@
                                 </div>
                             </div>
                         </div>
-                    `
-                    subtitle = `Primary: ${f.name} • Secondary drives: ${factions[sec1].short} + ${factions[sec2].short}`
-                    descriptionText = combo ? combo.description : `You are driven primarily by the ${f.name}, with notable secondary leanings toward both ${factions[sec1].short} and ${factions[sec2].short}.`
+                    `;
+                    subtitle = `Primary: ${f.name} • Secondary drives: ${factions[sec1].short} + ${factions[sec2].short}`;
+                    descriptionText = combo ? combo.description : `You are driven primarily by the ${f.name}, with notable secondary leanings toward both ${factions[sec1].short} and ${factions[sec2].short}.`;
                 } else {
-                    // Single clear winner — use ORIGINAL Bethesda-style description
                     mainHTML = `
                         <div class="flex gap-8 items-start">
                             <div class="text-8xl flex-shrink-0">${f.emoji}</div>
@@ -398,20 +377,16 @@
                                 <div class="title-font text-5xl">${f.name} <span class="text-2xl font-normal text-white/70">(${maxCount} choices)</span></div>
                             </div>
                         </div>
-                    `
-                    subtitle = `Your choices clearly align with the ${f.name}`
-                    descriptionText = originalDescriptions[topLetter]
+                    `;
+                    subtitle = `Your choices clearly align with the ${f.name}`;
+                    descriptionText = originalDescriptions[topLetter];
                 }
-            }
-            // Tie for highest
-            else {
-                const tiedLetters = sortedCounts.filter(([_, c]) => c === maxCount).map(([l]) => l)
+            } else {
+                const tiedLetters = sortedCounts.filter(([_, c]) => c === maxCount).map(([l]) => l);
                 if (tiedLetters.length === 2) {
-                    const l1 = tiedLetters[0]
-                    const l2 = tiedLetters[1]
-                    const comboKey = [l1, l2].sort().join('+')
-                    const combo = combinations[comboKey]
-                    
+                    const l1 = tiedLetters[0], l2 = tiedLetters[1];
+                    const comboKey = [l1, l2].sort().join('+');
+                    const combo = combinations[comboKey];
                     if (combo) {
                         mainHTML = `
                             <div class="flex flex-col md:flex-row gap-8">
@@ -427,18 +402,16 @@
                             <div class="text-center mt-8">
                                 <div class="inline-block bg-gradient-to-r from-cyan-400 to-purple-500 text-black font-bold px-8 py-3 rounded-3xl text-xl">${combo.persona}</div>
                             </div>
-                        `
-                        subtitle = `Tied between ${factions[l1].name} and ${factions[l2].name}`
-                        descriptionText = combo.description
-                    } else {
-                        descriptionText = `Your choices are evenly split between ${factions[l1].name} and ${factions[l2].name}.`
+                        `;
+                        subtitle = `Tied between ${factions[l1].name} and ${factions[l2].name}`;
+                        descriptionText = combo.description;
                     }
                 }
             }
             
-            document.getElementById('main-persona').innerHTML = mainHTML
-            document.getElementById('result-subtitle').innerHTML = subtitle
-            document.getElementById('choice-description').innerHTML = descriptionText || "Your pattern reveals a unique mix of motivations across the Settled Systems."
+            document.getElementById('main-persona').innerHTML = mainHTML;
+            document.getElementById('result-subtitle').innerHTML = subtitle;
+            document.getElementById('choice-description').innerHTML = descriptionText || "Your pattern reveals a unique mix of motivations across the Settled Systems.";
             
             // Breakdown
             const breakdownHTML = Object.keys(counts).map(letter => `
@@ -447,16 +420,16 @@
                     <div class="text-4xl font-semibold mt-1">${counts[letter]}</div>
                     <div class="text-xs uppercase tracking-widest mt-2 text-white/50">times chosen</div>
                 </div>
-            `).join('')
-            document.getElementById('breakdown').innerHTML = breakdownHTML
+            `).join('');
+            document.getElementById('breakdown').innerHTML = breakdownHTML;
         }
 
         function restartQuiz() {
-            document.getElementById('results').classList.add('hidden')
-            document.getElementById('intro').classList.remove('hidden')
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('intro').classList.remove('hidden');
         }
 
-        console.log("%cStarfield Faction Quiz with disclaimer added", "color:#67e8f9; font-family:monospace")
+        console.log("%cStarfield Faction Quiz – Share button removed", "color:#67e8f9; font-family:monospace");
     </script>
 </body>
 </html>
