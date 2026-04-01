@@ -126,9 +126,16 @@
                 </div>
 
                 <!-- What your choices say about you -->
-                <div class="bg-white/5 border border-white/20 rounded-3xl p-8">
+                <div class="bg-white/5 border border-white/20 rounded-3xl p-8 mb-10">
                     <div class="uppercase text-xs text-amber-300 tracking-widest mb-4">WHAT YOUR CHOICES SAY ABOUT YOU</div>
                     <div id="choice-description" class="text-lg leading-relaxed"></div>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="text-center">
+                    <p class="text-xs text-white/40 max-w-2xl mx-auto">
+                        Disclaimer: This interactive tool is a non-commercial fan project. Starfield, its factions, and the original quiz content are trademarks and copyright of Bethesda Softworks and ZeniMax Media. No challenge to ownership is intended.
+                    </p>
                 </div>
 
                 <div class="flex gap-4 mt-12">
@@ -237,7 +244,6 @@
             "C+D": { persona: "The Outlaw Hero", description: "You are the ultimate individualist. You view the United Colonies as an overbearing parent and would rather live dangerously in the \"Wild West\" of space. You might break the law, but you have a personal code of honor that the bureaucrats in New Atlantis could never understand." }
         }
 
-        // Original Bethesda-style "What your choices say about you" for clear single majority (mostly A / B / C / D)
         const originalDescriptions = {
             A: "People who chose mostly A tend to be curious scientists and explorers at heart. They prioritize discovery, knowledge, and pushing the boundaries of what we know about the universe. You are drawn to the unknown and thrive on uncovering the mysteries of the stars.",
             B: "People who chose mostly B are disciplined and principled. They believe in following rules, protecting the collective, and maintaining order across the Settled Systems. Duty and structure guide your decisions as you help build a safer future for humanity.",
@@ -450,7 +456,7 @@
             document.getElementById('intro').classList.remove('hidden')
         }
 
-        console.log("%cStarfield Faction Quiz – Final version with original Bethesda 'What your choices say about you' for clear single winners", "color:#67e8f9; font-family:monospace")
+        console.log("%cStarfield Faction Quiz with disclaimer added", "color:#67e8f9; font-family:monospace")
     </script>
 </body>
 </html>
