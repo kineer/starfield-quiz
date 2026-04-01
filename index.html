@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starfield Faction Quiz • Interactive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        .title-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        .star-bg {
+            background: radial-gradient(circle at center, #0a0a2e 0%, #000000 70%);
+            position: relative;
+        }
+        .star-bg::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2210%22 cy=%2210%22 r=%221%22 fill=%22%23ffffff%22 fill-opacity=%220.15%22/%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%221%22 fill=%22%23ffffff%22 fill-opacity=%220.1%22/%3E%3Ccircle cx=%2270%22 cy=%2220%22 r=%221%22 fill=%22%23ffffff%22 fill-opacity=%220.2%22/%3E%3Ccircle cx=%2290%22 cy=%2280%22 r=%221%22 fill=%22%23ffffff%22 fill-opacity=%220.15%22/%3E%3C/svg%27') repeat;
+            animation: twinkle 8s infinite alternate;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .option {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -5px rgb(0 0 0 / 0.4);
+        }
+        .selected {
+            border-color: #67e8f9;
+            background-color: rgba(103, 232, 249, 0.15);
+            box-shadow: 0 0 0 4px rgba(103, 232, 249, 0.3);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .result-bar {
+            transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+    </style>
+</head>
+<body class="star-bg text-white min-h-screen pb-16">
+    <div class="max-w-4xl mx-auto px-6 pt-10 relative z-10">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-10">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-3xl shadow-inner">🌌</div>
+                <div>
+                    <h1 class="title-font text-5xl tracking-[-2px] leading-none">STARFIELD</h1>
+                    <p class="text-cyan-300 text-sm -mt-1 tracking-widest">FACTION QUIZ</p>
+                </div>
+            </div>
+            <div class="text-xs uppercase tracking-[3px] text-white/50 font-medium">Interactive Edition • Real-time Scoring</div>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl overflow-hidden shadow-2xl">
+            
+            <!-- Intro -->
+            <div id="intro" class="p-12 text-center">
+                <div class="max-w-lg mx-auto">
+                    <div class="inline-block bg-gradient-to-r from-cyan-400 to-purple-600 text-black text-sm font-bold px-6 py-2 rounded-full mb-6">OFFICIAL STYLE QUIZ</div>
+                    <h2 class="title-font text-6xl leading-none tracking-tighter mb-6">The galaxy doesn’t care who you used to be.</h2>
+                    <p class="text-2xl text-white/80">Answer 8 scenarios. We'll average your choices (A=1, B=2, C=3, D=4) and reveal your faction match + blend.</p>
+                    
+                    <button onclick="startQuiz()" 
+                            class="mt-12 w-full max-w-sm mx-auto bg-white hover:bg-cyan-200 transition-all text-black font-bold text-2xl py-7 rounded-3xl flex items-center justify-center gap-4 active:scale-95">
+                        START THE QUIZ
+                        <span class="text-4xl">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz -->
+            <div id="quiz" class="hidden">
+                <div class="px-10 pt-8 pb-4">
+                    <div class="flex justify-between items-center text-sm mb-3">
+                        <div>Scenario <span id="q-num" class="font-mono text-cyan-300">1</span>/8</div>
+                        <div class="text-white/60">Your average updates live</div>
+                    </div>
+                    <div class="h-1.5 bg-white/10 rounded-full">
+                        <div id="progress" class="progress-bar h-1.5 bg-gradient-to-r from-cyan-400 to-purple-500 w-[12.5%] rounded-full"></div>
+                    </div>
+                </div>
+
+                <div class="px-10">
+                    <div id="scenario" class="text-3xl font-medium leading-tight min-h-[120px] mb-10"></div>
+
+                    <div id="answers" class="space-y-4">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+
+                <div class="px-10 py-8 border-t border-white/10 mt-12 flex justify-between items-center bg-black/30">
+                    <button onclick="prevQuestion()" class="text-white/60 hover:text-white flex items-center gap-2 text-lg">
+                        ← Previous
+                    </button>
+                    <button id="next-button" onclick="nextQuestion()" 
+                            class="hidden px-10 py-4 bg-white/10 hover:bg-white/20 rounded-3xl text-xl font-medium transition-all">
+                        Next Scenario →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div id="results" class="hidden p-12">
+                <div class="text-center mb-10">
+                    <h2 class="title-font text-5xl mb-2">Your Faction Match</h2>
+                    <p id="result-subtitle" class="text-xl text-white/70"></p>
+                </div>
+
+                <!-- Primary Match -->
+                <div class="bg-gradient-to-br from-white/10 to-transparent border border-white/30 rounded-3xl p-8 mb-12">
+                    <div class="flex gap-6 items-start">
+                        <div id="primary-emoji" class="text-8xl flex-shrink-0"></div>
+                        <div class="flex-1">
+                            <div class="uppercase text-xs tracking-widest text-cyan-300 mb-1">YOUR PRIMARY FACTION</div>
+                            <div id="primary-faction" class="title-font text-5xl leading-none"></div>
+                            <div id="primary-desc" class="mt-4 text-lg text-white/80"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Average Score -->
+                <div class="mb-12">
+                    <div class="flex justify-between mb-4 items-baseline">
+                        <div class="text-lg font-medium">Your Average Score: <span id="final-average" class="text-cyan-400 font-mono text-4xl"></span></div>
+                        <div class="text-sm text-white/50">(A=1 • B=2 • C=3 • D=4)</div>
+                    </div>
+                    <div class="h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div id="average-bar" class="h-3 bg-gradient-to-r from-purple-400 via-cyan-400 to-amber-400 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Breakdown -->
+                <div class="mb-12">
+                    <h3 class="uppercase text-sm tracking-widest mb-6 text-white/60">Choice Breakdown</h3>
+                    <div id="breakdown" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- JS populated A B C D counts -->
+                    </div>
+                </div>
+
+                <!-- Description based on majority -->
+                <div class="bg-white/5 border border-white/20 rounded-3xl p-8 mb-12">
+                    <div class="uppercase text-xs text-amber-300 tracking-widest mb-3">What your choices say about you</div>
+                    <div id="majority-desc" class="text-lg leading-relaxed"></div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="restartQuiz()" 
+                            class="flex-1 py-6 rounded-3xl border border-white/40 hover:border-white text-lg font-semibold transition-colors">
+                        RETAKE QUIZ
+                    </button>
+                    <a href="https://bethesda.net/en/article/1rHrPVkLkWHv1aeoV0eC8g/starfield-faction-quiz" target="_blank"
+                       class="flex-1 py-6 rounded-3xl bg-white text-black text-lg font-semibold flex items-center justify-center hover:bg-amber-300 transition-colors">
+                        ORIGINAL BETHESDA QUIZ →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Real Starfield-themed scenarios (faithful recreation of typical Bethesda quiz style)
+        const scenarios = [
+            {
+                text: "You discover an abandoned ship drifting in space. What do you do?",
+                answers: [
+                    { letter: "A", text: "Board it carefully and look for scientific data or artifacts." },
+                    { letter: "B", text: "Hail it first and follow proper United Colonies contact protocols." },
+                    { letter: "C", text: "Salvage anything useful and claim it for yourself." },
+                    { letter: "D", text: "Take whatever looks valuable and get out fast." }
+                ]
+            },
+            {
+                text: "A fellow spacer offers you a shady job with big pay. Your response?",
+                answers: [
+                    { letter: "A", text: "Only accept if it involves exploring unknown systems." },
+                    { letter: "B", text: "Decline – it probably violates UC law." },
+                    { letter: "C", text: "Do it if it doesn't hurt anyone and pays well." },
+                    { letter: "D", text: "Take the job and double-cross them if possible." }
+                ]
+            },
+            {
+                text: "When facing hostile pirates, you prefer to:",
+                answers: [
+                    { letter: "A", text: "Try to reason or learn something from them first." },
+                    { letter: "B", text: "Follow strict military procedure and call for backup." },
+                    { letter: "C", text: "Stand your ground and fight fair." },
+                    { letter: "D", text: "Hit them hard and take their ship." }
+                ]
+            },
+            {
+                text: "The most important thing in the Settled Systems is:",
+                answers: [
+                    { letter: "A", text: "Discovering the secrets of the universe." },
+                    { letter: "B", text: "Maintaining law, order, and safety for all." },
+                    { letter: "C", text: "Freedom and self-reliance on the frontier." },
+                    { letter: "D", text: "Power, credits, and looking out for number one." }
+                ]
+            },
+            {
+                text: "You find a powerful piece of lost technology. You:",
+                answers: [
+                    { letter: "A", text: "Study it with a team of researchers." },
+                    { letter: "B", text: "Turn it over to the authorities immediately." },
+                    { letter: "C", text: "Keep it and use it to improve your own ship." },
+                    { letter: "D", text: "Sell it to the highest bidder on the black market." }
+                ]
+            },
+            {
+                text: "Your ideal crew would be full of:",
+                answers: [
+                    { letter: "A", text: "Scientists and explorers driven by curiosity." },
+                    { letter: "B", text: "Disciplined soldiers who follow the rules." },
+                    { letter: "C", text: "Tough, loyal frontier types who have your back." },
+                    { letter: "D", text: "Cunning survivors who know how to get things done." }
+                ]
+            },
+            {
+                text: "How do you handle a moral gray area during a mission?",
+                answers: [
+                    { letter: "A", text: "Weigh the potential for new knowledge." },
+                    { letter: "B", text: "Stick strictly to regulations and ethics." },
+                    { letter: "C", text: "Do what feels right in the moment." },
+                    { letter: "D", text: "Whatever gets me the best outcome." }
+                ]
+            },
+            {
+                text: "At the end of the day, you want to be remembered as:",
+                answers: [
+                    { letter: "A", text: "A legendary explorer who pushed humanity forward." },
+                    { letter: "B", text: "A loyal defender of the United Colonies." },
+                    { letter: "C", text: "An independent hero of the Freestar frontier." },
+                    { letter: "D", text: "A feared and respected force in the galaxy." }
+                ]
+            }
+        ]
+
+        // Faction mapping based on average score (1.0 - 4.0)
+        const factionMap = [
+            { min: 1.0, max: 1.75, name: "Constellation", emoji: "🔭", color: "#67e8f9",
+              desc: "You are a true explorer and seeker of knowledge. The unknown calls to you more than power or profit." },
+            { min: 1.76, max: 2.5, name: "United Colonies", emoji: "🛡️", color: "#4ade80",
+              desc: "You value law, order, and the greater good. Structure and duty define how you navigate the stars." },
+            { min: 2.51, max: 3.25, name: "Freestar Collective", emoji: "🤠", color: "#fcd34d",
+              desc: "You believe in freedom and self-reliance. The frontier spirit runs strong in your decisions." },
+            { min: 3.26, max: 4.0, name: "Crimson Fleet", emoji: "🏴‍☠️", color: "#f43f5e",
+              desc: "You live by your own rules. Power, survival, and personal gain drive your choices in the galaxy." }
+        ]
+
+        // Majority descriptions (as requested)
+        const majorityDescriptions = {
+            "A": "People who chose mostly A tend to be curious scientists and explorers at heart. They prioritize discovery, knowledge, and pushing the boundaries of what we know about the universe.",
+            "B": "People who chose mostly B are disciplined and principled. They believe in following rules, protecting the collective, and maintaining order across the Settled Systems.",
+            "C": "People who chose mostly C value independence and practicality. They embody the rugged frontier spirit – freedom, self-reliance, and doing what needs to be done.",
+            "D": "People who chose mostly D are bold and opportunistic. They thrive on risk, personal power, and bending situations to their advantage, often with a pirate's cunning."
+        }
+
+        let currentIndex = 0
+        let answersSelected = [] // array of numbers 1-4 corresponding to A B C D
+
+        function startQuiz() {
+            document.getElementById('intro').classList.add('hidden')
+            document.getElementById('quiz').classList.remove('hidden')
+            currentIndex = 0
+            answersSelected = new Array(scenarios.length).fill(0)
+            loadScenario()
+        }
+
+        function loadScenario() {
+            const scenario = scenarios[currentIndex]
+            
+            document.getElementById('q-num').textContent = currentIndex + 1
+            document.getElementById('scenario').innerHTML = `<span class="text-cyan-400">Scenario ${currentIndex + 1}:</span> ${scenario.text}`
+            
+            const container = document.getElementById('answers')
+            container.innerHTML = ''
+            
+            scenario.answers.forEach(ans => {
+                const value = ans.letter.charCodeAt(0) - 64  // A=1, B=2, C=3, D=4
+                
+                const div = document.createElement('div')
+                div.className = `option cursor-pointer border border-white/30 bg-white/5 hover:bg-white/10 rounded-3xl p-6 flex items-center gap-6 text-xl`
+                if (answersSelected[currentIndex] === value) div.classList.add('selected')
+                
+                div.innerHTML = `
+                    <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center text-3xl font-bold text-cyan-300">${ans.letter}</div>
+                    <div class="flex-1">${ans.text}</div>
+                `
+                div.onclick = () => {
+                    answersSelected[currentIndex] = value
+                    loadScenario() // refresh to show selection
+                    document.getElementById('next-button').classList.remove('hidden')
+                }
+                container.appendChild(div)
+            })
+            
+            // Show next only if answered
+            if (answersSelected[currentIndex] > 0) {
+                document.getElementById('next-button').classList.remove('hidden')
+            } else {
+                document.getElementById('next-button').classList.add('hidden')
+            }
+            
+            // Progress
+            const progress = ((currentIndex) / scenarios.length) * 100
+            document.getElementById('progress').style.width = `${progress}%`
+        }
+
+        function nextQuestion() {
+            if (answersSelected[currentIndex] === 0) return
+            
+            if (currentIndex < scenarios.length - 1) {
+                currentIndex++
+                loadScenario()
+            } else {
+                showResults()
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--
+                loadScenario()
+            }
+        }
+
+        function calculateAverage() {
+            const answered = answersSelected.filter(n => n > 0)
+            if (answered.length === 0) return 0
+            return (answered.reduce((a, b) => a + b, 0) / answered.length).toFixed(2)
+        }
+
+        function getFactionFromAverage(avg) {
+            return factionMap.find(f => avg >= f.min && avg <= f.max) || factionMap[0]
+        }
+
+        function showResults() {
+            document.getElementById('quiz').classList.add('hidden')
+            document.getElementById('results').classList.remove('hidden')
+            
+            const avg = parseFloat(calculateAverage())
+            const faction = getFactionFromAverage(avg)
+            
+            // Primary
+            document.getElementById('primary-emoji').textContent = faction.emoji
+            document.getElementById('primary-faction').innerHTML = `${faction.name} <span class="text-2xl font-normal text-white/70">(${avg})</span>`
+            document.getElementById('primary-desc').textContent = faction.desc
+            document.getElementById('final-average').textContent = avg
+            
+            // Average bar (scaled 1-4 → 0-100%)
+            const barWidth = ((avg - 1) / 3) * 100
+            document.getElementById('average-bar').style.width = `${barWidth}%`
+            
+            // Breakdown A B C D
+            const counts = {A:0, B:0, C:0, D:0}
+            answersSelected.forEach(val => {
+                if (val >=1 && val <=4) {
+                    const letter = String.fromCharCode(64 + val)
+                    counts[letter]++
+                }
+            })
+            
+            const breakdownHTML = Object.keys(counts).map(letter => `
+                <div class="bg-white/5 rounded-3xl p-6 text-center">
+                    <div class="text-6xl font-bold text-cyan-300">${letter}</div>
+                    <div class="text-4xl font-semibold mt-1">${counts[letter]}</div>
+                    <div class="text-xs uppercase tracking-widest mt-2 text-white/50">times chosen</div>
+                </div>
+            `).join('')
+            
+            document.getElementById('breakdown').innerHTML = breakdownHTML
+            
+            // Majority description
+            let majorityLetter = "A"
+            let maxCount = counts.A
+            if (counts.B > maxCount) { majorityLetter = "B"; maxCount = counts.B }
+            if (counts.C > maxCount) { majorityLetter = "C"; maxCount = counts.C }
+            if (counts.D > maxCount) { majorityLetter = "D"; maxCount = counts.D }
+            
+            document.getElementById('majority-desc').innerHTML = majorityDescriptions[majorityLetter]
+            
+            // Subtitle
+            document.getElementById('result-subtitle').innerHTML = `Your average answer score of <span class="font-mono text-cyan-400">${avg}</span> points to the <span class="font-semibold">${faction.name}</span>`
+        }
+
+        function restartQuiz() {
+            document.getElementById('results').classList.add('hidden')
+            document.getElementById('intro').classList.remove('hidden')
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('quiz').classList.contains('hidden')) return
+            if (e.key === "ArrowRight") nextQuestion()
+            if (e.key === "ArrowLeft") prevQuestion()
+        })
+
+        console.log("%cStarfield Faction Quiz ready – Scenarios with A/B/C/D scoring & majority descriptions loaded.", "color:#67e8f9; font-family:monospace")
+    </script>
+</body>
+</html>
