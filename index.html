@@ -47,7 +47,7 @@
         }
     </style>
 </head>
-<body class="star-bg text-white min-h-screen pb-20">
+<body class="star-bg text-white min-h-screen pb-16">
     <div class="max-w-4xl mx-auto px-6 pt-10 relative z-10">
         <!-- Header -->
         <div class="flex justify-between items-center mb-10">
@@ -92,7 +92,10 @@
 
                 <div class="px-10">
                     <div id="scenario" class="text-3xl font-medium leading-tight min-h-[120px] mb-10"></div>
-                    <div id="answers" class="space-y-4"></div>
+
+                    <div id="answers" class="space-y-4">
+                        <!-- JS populated -->
+                    </div>
                 </div>
 
                 <div class="px-10 py-8 border-t border-white/10 mt-12 flex justify-between items-center bg-black/30">
@@ -117,7 +120,9 @@
                 <!-- Breakdown -->
                 <div class="mb-12">
                     <h3 class="uppercase text-sm tracking-widest mb-6 text-white/60">Choice Breakdown</h3>
-                    <div id="breakdown" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                    <div id="breakdown" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- JS populated -->
+                    </div>
                 </div>
 
                 <!-- What your choices say about you -->
@@ -127,19 +132,13 @@
                 </div>
 
                 <!-- Disclaimer -->
-                <div class="text-center mb-8">
+                <div class="text-center">
                     <p class="text-xs text-white/40 max-w-2xl mx-auto">
                         Disclaimer: This interactive tool is a non-commercial fan project. Starfield, its factions, and the original quiz content are trademarks and copyright of Bethesda Softworks and ZeniMax Media. No challenge to ownership is intended.
                     </p>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button onclick="shareResults()" 
-                            class="flex-1 py-6 rounded-3xl bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-500 hover:to-purple-600 text-black font-semibold text-lg flex items-center justify-center gap-3 transition-all active:scale-95">
-                        <span>📋</span>
-                        SHARE MY FACTION
-                    </button>
+                <div class="flex gap-4 mt-12">
                     <button onclick="restartQuiz()" 
                             class="flex-1 py-6 rounded-3xl border border-white/40 hover:border-white text-lg font-semibold transition-colors">
                         RETAKE QUIZ
@@ -154,131 +153,292 @@
     </div>
 
     <script>
-        // ... (scenarios, factions, combinations, originalDescriptions, neutralDescription remain the same as previous version)
+        const scenarios = [
+            {
+                text: "You discover an abandoned ship drifting in space. What do you do?",
+                answers: [
+                    { letter: "A", text: "Board it carefully and look for scientific data or artifacts." },
+                    { letter: "B", text: "Hail it first and follow proper United Colonies contact protocols." },
+                    { letter: "C", text: "Salvage anything useful and claim it for yourself." },
+                    { letter: "D", text: "Take whatever looks valuable and get out fast." }
+                ]
+            },
+            {
+                text: "A fellow spacer offers you a shady job with big pay. Your response?",
+                answers: [
+                    { letter: "A", text: "Only accept if it involves exploring unknown systems." },
+                    { letter: "B", text: "Decline – it probably violates UC law." },
+                    { letter: "C", text: "Do it if it doesn't hurt anyone and pays well." },
+                    { letter: "D", text: "Take the job and double-cross them if possible." }
+                ]
+            },
+            {
+                text: "When facing hostile pirates, you prefer to:",
+                answers: [
+                    { letter: "A", text: "Try to reason or learn something from them first." },
+                    { letter: "B", text: "Follow strict military procedure and call for backup." },
+                    { letter: "C", text: "Stand your ground and fight fair." },
+                    { letter: "D", text: "Hit them hard and take their ship." }
+                ]
+            },
+            {
+                text: "The most important thing in the Settled Systems is:",
+                answers: [
+                    { letter: "A", text: "Discovering the secrets of the universe." },
+                    { letter: "B", text: "Maintaining law, order, and safety for all." },
+                    { letter: "C", text: "Freedom and self-reliance on the frontier." },
+                    { letter: "D", text: "Power, credits, and looking out for number one." }
+                ]
+            },
+            {
+                text: "You find a powerful piece of lost technology. You:",
+                answers: [
+                    { letter: "A", text: "Study it with a team of researchers." },
+                    { letter: "B", text: "Turn it over to the authorities immediately." },
+                    { letter: "C", text: "Keep it and use it to improve your own ship." },
+                    { letter: "D", text: "Sell it to the highest bidder on the black market." }
+                ]
+            },
+            {
+                text: "Your ideal crew would be full of:",
+                answers: [
+                    { letter: "A", text: "Scientists and explorers driven by curiosity." },
+                    { letter: "B", text: "Disciplined soldiers who follow the rules." },
+                    { letter: "C", text: "Tough, loyal frontier types who have your back." },
+                    { letter: "D", text: "Cunning survivors who know how to get things done." }
+                ]
+            },
+            {
+                text: "How do you handle a moral gray area during a mission?",
+                answers: [
+                    { letter: "A", text: "Weigh the potential for new knowledge." },
+                    { letter: "B", text: "Stick strictly to regulations and ethics." },
+                    { letter: "C", text: "Do what feels right in the moment." },
+                    { letter: "D", text: "Whatever gets me the best outcome." }
+                ]
+            },
+            {
+                text: "At the end of the day, you want to be remembered as:",
+                answers: [
+                    { letter: "A", text: "A legendary explorer who pushed humanity forward." },
+                    { letter: "B", text: "A loyal defender of the United Colonies." },
+                    { letter: "C", text: "An independent hero of the Freestar frontier." },
+                    { letter: "D", text: "A feared and respected force in the galaxy." }
+                ]
+            }
+        ]
 
-        const scenarios = [ /* same as before */ ];
-        const factions = { /* same */ };
-        const combinations = { /* same */ };
-        const originalDescriptions = { /* same */ };
-        const neutralDescription = "You are a true neutral captain — balanced across all philosophies of the Settled Systems. No single faction fully defines you. You adapt to the situation, drawing from exploration, duty, freedom, and survival as needed. This flexibility makes you unpredictable, versatile, and dangerous in your own way. The galaxy is your playground, and you play by your own ever-changing rules.";
+        const factions = {
+            A: { name: "Constellation", emoji: "🔭", short: "Constellation" },
+            B: { name: "United Colonies Vanguard", emoji: "🛡️", short: "UC Vanguard" },
+            C: { name: "Freestar Collective", emoji: "🤠", short: "Freestar Collective" },
+            D: { name: "Crimson Fleet", emoji: "🏴‍☠️", short: "Crimson Fleet" }
+        }
 
-        let currentIndex = 0;
-        let answersSelected = [];
+        const combinations = {
+            "A+B": { persona: "The Explorer-Soldier", description: "You believe that humanity’s future in the stars must be protected by a steady hand. You aren't just out there for the science; you're the one making sure the frontier stays safe for everyone else. You value order, but only if it serves the greater mystery." },
+            "A+C": { persona: "The Lone Pioneer", description: "You represent the true spirit of the frontier. To you, discovery is a personal right, not a government project. You’d rather map a new system in a beat-up hopper than a shiny military vessel. You seek the truth, but you want to find it on your own terms." },
+            "B+C": { persona: "The Galactic Peacekeeper", description: "You’ve found the impossible middle ground. You respect the need for local sovereignty but understand that without some form of unified protection, the Settled Systems would fall to chaos. You are the pragmatist who realizes that a badge and a uniform both mean the same thing: Duty." },
+            "A+D": { persona: "The Rogue Scholar", description: "You follow the \"find-and-keep\" rule. You’re driven by an insatiable curiosity, but you have zero interest in following the laws of those who didn't do the work. To you, the artifacts and the loot are one and the same—valuable, rare, and rightfully yours." },
+            "B+D": { persona: "The Enforcer", description: "You understand power better than anyone else. Whether you’re wearing a uniform or a pirate’s jacket, you know that might makes right. You likely have a \"results at any cost\" mentality, making you a dangerous ally and an even worse enemy." },
+            "C+D": { persona: "The Outlaw Hero", description: "You are the ultimate individualist. You view the United Colonies as an overbearing parent and would rather live dangerously in the \"Wild West\" of space. You might break the law, but you have a personal code of honor that the bureaucrats in New Atlantis could never understand." }
+        }
+
+        const originalDescriptions = {
+            A: "People who chose mostly A tend to be curious scientists and explorers at heart. They prioritize discovery, knowledge, and pushing the boundaries of what we know about the universe. You are drawn to the unknown and thrive on uncovering the mysteries of the stars.",
+            B: "People who chose mostly B are disciplined and principled. They believe in following rules, protecting the collective, and maintaining order across the Settled Systems. Duty and structure guide your decisions as you help build a safer future for humanity.",
+            C: "People who chose mostly C value independence and practicality. They embody the rugged frontier spirit – freedom, self-reliance, and doing what needs to be done without unnecessary interference. You carve your own path among the stars.",
+            D: "People who chose mostly D are bold and opportunistic. They thrive on risk, personal power, and bending situations to their advantage, often with a pirate's cunning. You live by your own code and seize every opportunity the galaxy offers."
+        }
+
+        const neutralDescription = "You are a true neutral captain — balanced across all philosophies of the Settled Systems. No single faction fully defines you. You adapt to the situation, drawing from exploration, duty, freedom, and survival as needed. This flexibility makes you unpredictable, versatile, and dangerous in your own way. The galaxy is your playground, and you play by your own ever-changing rules."
+
+        let currentIndex = 0
+        let answersSelected = [] // 1=A, 2=B, 3=C, 4=D
 
         function startQuiz() {
-            document.getElementById('intro').classList.add('hidden');
-            document.getElementById('quiz').classList.remove('hidden');
-            currentIndex = 0;
-            answersSelected = new Array(scenarios.length).fill(0);
-            loadScenario();
+            document.getElementById('intro').classList.add('hidden')
+            document.getElementById('quiz').classList.remove('hidden')
+            currentIndex = 0
+            answersSelected = new Array(scenarios.length).fill(0)
+            loadScenario()
         }
 
         function loadScenario() {
-            const scenario = scenarios[currentIndex];
-            document.getElementById('q-num').textContent = currentIndex + 1;
-            document.getElementById('scenario').innerHTML = `<span class="text-cyan-400">Scenario ${currentIndex + 1}:</span> ${scenario.text}`;
+            const scenario = scenarios[currentIndex]
             
-            const container = document.getElementById('answers');
-            container.innerHTML = '';
+            document.getElementById('q-num').textContent = currentIndex + 1
+            document.getElementById('scenario').innerHTML = `<span class="text-cyan-400">Scenario ${currentIndex + 1}:</span> ${scenario.text}`
+            
+            const container = document.getElementById('answers')
+            container.innerHTML = ''
             
             scenario.answers.forEach(ans => {
-                const value = ans.letter.charCodeAt(0) - 64;
-                const div = document.createElement('div');
-                div.className = `option cursor-pointer border border-white/30 bg-white/5 hover:bg-white/10 rounded-3xl p-6 flex items-center gap-6 text-xl`;
-                if (answersSelected[currentIndex] === value) div.classList.add('selected');
+                const value = ans.letter.charCodeAt(0) - 64
+                
+                const div = document.createElement('div')
+                div.className = `option cursor-pointer border border-white/30 bg-white/5 hover:bg-white/10 rounded-3xl p-6 flex items-center gap-6 text-xl`
+                if (answersSelected[currentIndex] === value) div.classList.add('selected')
                 
                 div.innerHTML = `
                     <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/10 flex items-center justify-center text-3xl font-bold text-cyan-300">${ans.letter}</div>
                     <div class="flex-1">${ans.text}</div>
-                `;
+                `
                 div.onclick = () => {
-                    answersSelected[currentIndex] = value;
+                    answersSelected[currentIndex] = value
                     setTimeout(() => {
                         if (currentIndex < scenarios.length - 1) {
-                            currentIndex++;
-                            loadScenario();
+                            currentIndex++
+                            loadScenario()
                         } else {
-                            showResults();
+                            showResults()
                         }
-                    }, 280);
-                };
-                container.appendChild(div);
-            });
+                    }, 280)
+                }
+                container.appendChild(div)
+            })
             
-            const progress = ((currentIndex) / scenarios.length) * 100;
-            document.getElementById('progress').style.width = `${progress}%`;
+            const progress = ((currentIndex) / scenarios.length) * 100
+            document.getElementById('progress').style.width = `${progress}%`
         }
 
         function prevQuestion() {
             if (currentIndex > 0) {
-                currentIndex--;
-                loadScenario();
+                currentIndex--
+                loadScenario()
             }
         }
 
         function getLetterCounts() {
-            const counts = {A:0, B:0, C:0, D:0};
+            const counts = {A:0, B:0, C:0, D:0}
             answersSelected.forEach(val => {
                 if (val >= 1 && val <= 4) {
-                    const letter = String.fromCharCode(64 + val);
-                    counts[letter]++;
+                    const letter = String.fromCharCode(64 + val)
+                    counts[letter]++
                 }
-            });
-            return counts;
+            })
+            return counts
         }
 
         function showResults() {
-            document.getElementById('quiz').classList.add('hidden');
-            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('quiz').classList.add('hidden')
+            document.getElementById('results').classList.remove('hidden')
             
-            const counts = getLetterCounts();
-            const sortedCounts = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+            const counts = getLetterCounts()
+            const sortedCounts = Object.entries(counts).sort((a, b) => b[1] - a[1])
             
-            let mainHTML = '', subtitle = '', descriptionText = '';
-            const maxCount = sortedCounts[0][1];
-            const secondCount = sortedCounts[1][1];
-
+            let mainHTML = ''
+            let subtitle = ''
+            let descriptionText = ''
+            
+            const maxCount = sortedCounts[0][1]
+            const secondCount = sortedCounts[1][1]
+            
+            // True neutral: exactly 2 each
             if (counts.A === 2 && counts.B === 2 && counts.C === 2 && counts.D === 2) {
-                mainHTML = `<div class="text-center"><div class="text-7xl mb-6">🌌</div><div class="title-font text-5xl mb-3">The True Neutral</div><div class="text-cyan-300 text-xl">A Balanced Captain of the Settled Systems</div></div>`;
-                subtitle = "Your choices show perfect balance across every faction";
-                descriptionText = neutralDescription;
-            } else if (maxCount > secondCount) {
-                const topLetter = sortedCounts[0][0];
-                const f = factions[topLetter];
-                const seconds = sortedCounts.slice(1).filter(([_, c]) => c === secondCount);
-                const hasTiedSecond = seconds.length === 2;
-
+                mainHTML = `
+                    <div class="text-center">
+                        <div class="text-7xl mb-6">🌌</div>
+                        <div class="title-font text-5xl mb-3">The True Neutral</div>
+                        <div class="text-cyan-300 text-xl">A Balanced Captain of the Settled Systems</div>
+                    </div>
+                `
+                subtitle = "Your choices show perfect balance across every faction"
+                descriptionText = neutralDescription
+            }
+            // Clear single winner (max > second)
+            else if (maxCount > secondCount) {
+                const topLetter = sortedCounts[0][0]
+                const f = factions[topLetter]
+                
+                // Check for two tied for second
+                const seconds = sortedCounts.slice(1).filter(([_, c]) => c === secondCount)
+                const hasTiedSecond = seconds.length >= 2 && seconds.length === 2
+                
                 if (hasTiedSecond) {
-                    const sec1 = seconds[0][0], sec2 = seconds[1][0];
-                    const comboKey = [topLetter, sec1].sort().join('+');
-                    const combo = combinations[comboKey] || combinations[[topLetter, sec2].sort().join('+')];
+                    // Primary + two tied secondary motivations
+                    const sec1 = seconds[0][0]
+                    const sec2 = seconds[1][0]
+                    const comboKey = [topLetter, sec1].sort().join('+')
+                    const combo = combinations[comboKey] || combinations[[topLetter, sec2].sort().join('+')]
                     
-                    mainHTML = `...`; // (same as previous version)
-                    subtitle = `Primary: ${f.name} • Secondary drives: ${factions[sec1].short} + ${factions[sec2].short}`;
-                    descriptionText = combo ? combo.description : `You are driven primarily by the ${f.name}, with notable secondary leanings toward both ${factions[sec1].short} and ${factions[sec2].short}.`;
+                    mainHTML = `
+                        <div class="flex gap-8 items-start">
+                            <div>
+                                <div class="text-8xl">${f.emoji}</div>
+                                <div class="mt-4 text-center">
+                                    <div class="font-medium">${f.name}</div>
+                                    <div class="text-xs text-white/60">Primary (${maxCount} choices)</div>
+                                </div>
+                            </div>
+                            <div class="flex-1 pt-6">
+                                <div class="uppercase text-xs tracking-widest text-amber-300 mb-2">Secondary Motivations</div>
+                                <div class="flex gap-4">
+                                    <div class="flex-1 bg-white/5 rounded-3xl p-5 text-center">
+                                        <div class="text-5xl mb-2">${factions[sec1].emoji}</div>
+                                        <div class="font-medium text-sm">${factions[sec1].short}</div>
+                                    </div>
+                                    <div class="flex-1 bg-white/5 rounded-3xl p-5 text-center">
+                                        <div class="text-5xl mb-2">${factions[sec2].emoji}</div>
+                                        <div class="font-medium text-sm">${factions[sec2].short}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                    subtitle = `Primary: ${f.name} • Secondary drives: ${factions[sec1].short} + ${factions[sec2].short}`
+                    descriptionText = combo ? combo.description : `You are driven primarily by the ${f.name}, with notable secondary leanings toward both ${factions[sec1].short} and ${factions[sec2].short}.`
                 } else {
-                    mainHTML = `<div class="flex gap-8 items-start"><div class="text-8xl flex-shrink-0">${f.emoji}</div><div class="flex-1"><div class="uppercase text-xs tracking-widest text-cyan-300 mb-1">YOUR PRIMARY FACTION</div><div class="title-font text-5xl">${f.name} <span class="text-2xl font-normal text-white/70">(${maxCount} choices)</span></div></div></div>`;
-                    subtitle = `Your choices clearly align with the ${f.name}`;
-                    descriptionText = originalDescriptions[topLetter];
+                    // Single clear winner — use ORIGINAL Bethesda-style description
+                    mainHTML = `
+                        <div class="flex gap-8 items-start">
+                            <div class="text-8xl flex-shrink-0">${f.emoji}</div>
+                            <div class="flex-1">
+                                <div class="uppercase text-xs tracking-widest text-cyan-300 mb-1">YOUR PRIMARY FACTION</div>
+                                <div class="title-font text-5xl">${f.name} <span class="text-2xl font-normal text-white/70">(${maxCount} choices)</span></div>
+                            </div>
+                        </div>
+                    `
+                    subtitle = `Your choices clearly align with the ${f.name}`
+                    descriptionText = originalDescriptions[topLetter]
                 }
-            } else {
-                // Tie for highest
-                const tiedLetters = sortedCounts.filter(([_, c]) => c === maxCount).map(([l]) => l);
+            }
+            // Tie for highest
+            else {
+                const tiedLetters = sortedCounts.filter(([_, c]) => c === maxCount).map(([l]) => l)
                 if (tiedLetters.length === 2) {
-                    const l1 = tiedLetters[0], l2 = tiedLetters[1];
-                    const comboKey = [l1, l2].sort().join('+');
-                    const combo = combinations[comboKey];
+                    const l1 = tiedLetters[0]
+                    const l2 = tiedLetters[1]
+                    const comboKey = [l1, l2].sort().join('+')
+                    const combo = combinations[comboKey]
+                    
                     if (combo) {
-                        mainHTML = `...`; // (same as before)
-                        subtitle = `Tied between ${factions[l1].name} and ${factions[l2].name}`;
-                        descriptionText = combo.description;
+                        mainHTML = `
+                            <div class="flex flex-col md:flex-row gap-8">
+                                <div class="flex-1 text-center">
+                                    <div class="text-7xl mb-3">${factions[l1].emoji}</div>
+                                    <div class="font-semibold">${factions[l1].name}</div>
+                                </div>
+                                <div class="flex-1 text-center">
+                                    <div class="text-7xl mb-3">${factions[l2].emoji}</div>
+                                    <div class="font-semibold">${factions[l2].name}</div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-8">
+                                <div class="inline-block bg-gradient-to-r from-cyan-400 to-purple-500 text-black font-bold px-8 py-3 rounded-3xl text-xl">${combo.persona}</div>
+                            </div>
+                        `
+                        subtitle = `Tied between ${factions[l1].name} and ${factions[l2].name}`
+                        descriptionText = combo.description
+                    } else {
+                        descriptionText = `Your choices are evenly split between ${factions[l1].name} and ${factions[l2].name}.`
                     }
                 }
             }
             
-            document.getElementById('main-persona').innerHTML = mainHTML;
-            document.getElementById('result-subtitle').innerHTML = subtitle;
-            document.getElementById('choice-description').innerHTML = descriptionText || "Your pattern reveals a unique mix of motivations across the Settled Systems.";
+            document.getElementById('main-persona').innerHTML = mainHTML
+            document.getElementById('result-subtitle').innerHTML = subtitle
+            document.getElementById('choice-description').innerHTML = descriptionText || "Your pattern reveals a unique mix of motivations across the Settled Systems."
             
             // Breakdown
             const breakdownHTML = Object.keys(counts).map(letter => `
@@ -287,55 +447,16 @@
                     <div class="text-4xl font-semibold mt-1">${counts[letter]}</div>
                     <div class="text-xs uppercase tracking-widest mt-2 text-white/50">times chosen</div>
                 </div>
-            `).join('');
-            document.getElementById('breakdown').innerHTML = breakdownHTML;
-        }
-
-        // NEW: Share Results Function
-        async function shareResults() {
-            const counts = getLetterCounts();
-            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-            const maxCount = sorted[0][1];
-            let resultText = "🌌 My Starfield Faction Quiz Result\n\n";
-
-            // Determine main result
-            if (counts.A === 2 && counts.B === 2 && counts.C === 2 && counts.D === 2) {
-                resultText += "I am a True Neutral Captain – balanced across all factions!\n\n";
-            } else if (maxCount > sorted[1][1]) {
-                const topLetter = sorted[0][0];
-                resultText += `My primary faction is ${factions[topLetter].name} (${maxCount} choices)\n\n`;
-            } else if (sorted[0][1] === sorted[1][1]) {
-                resultText += `I'm tied between ${factions[sorted[0][0]].name} and ${factions[sorted[1][0]].name}!\n\n`;
-            }
-
-            resultText += "My choices:\n";
-            Object.keys(counts).forEach(l => {
-                resultText += `${l}: ${counts[l]} times\n`;
-            });
-
-            resultText += "\nTake the quiz yourself: [Add your link here if you host it]";
-
-            try {
-                await navigator.clipboard.writeText(resultText);
-                const btn = document.querySelector('button[onclick="shareResults()"]');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '✅ COPIED TO CLIPBOARD!';
-                btn.style.backgroundColor = '#22c55e';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.backgroundColor = '';
-                }, 2500);
-            } catch (err) {
-                alert("Failed to copy. Please try again.");
-            }
+            `).join('')
+            document.getElementById('breakdown').innerHTML = breakdownHTML
         }
 
         function restartQuiz() {
-            document.getElementById('results').classList.add('hidden');
-            document.getElementById('intro').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden')
+            document.getElementById('intro').classList.remove('hidden')
         }
 
-        console.log("%cStarfield Faction Quiz – Share button added", "color:#67e8f9; font-family:monospace");
+        console.log("%cStarfield Faction Quiz with disclaimer added", "color:#67e8f9; font-family:monospace")
     </script>
 </body>
 </html>
