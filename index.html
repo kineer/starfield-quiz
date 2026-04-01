@@ -68,7 +68,7 @@
                 <div class="max-w-lg mx-auto">
                     <div class="inline-block bg-gradient-to-r from-cyan-400 to-purple-600 text-black text-sm font-bold px-6 py-2 rounded-full mb-6">OFFICIAL STYLE QUIZ</div>
                     <h2 class="title-font text-6xl leading-none tracking-tighter mb-6">The galaxy doesn’t care who you used to be.</h2>
-                    <p class="text-2xl text-white/80">Answer 8 scenarios. We'll analyze your choices and reveal your faction match(es).</p>
+                    <p class="text-2xl text-white/80">Answer 8 scenarios. We'll analyze your choices and reveal your true faction persona.</p>
                     
                     <button onclick="startQuiz()" 
                             class="mt-12 w-full max-w-sm mx-auto bg-white hover:bg-cyan-200 transition-all text-black font-bold text-2xl py-7 rounded-3xl flex items-center justify-center gap-4 active:scale-95">
@@ -108,13 +108,13 @@
             <!-- Results -->
             <div id="results" class="hidden p-12">
                 <div class="text-center mb-10">
-                    <h2 class="title-font text-5xl mb-2">Your Faction Match</h2>
+                    <h2 class="title-font text-5xl mb-2">Your Faction Persona</h2>
                     <p id="result-subtitle" class="text-xl text-white/70"></p>
                 </div>
 
-                <!-- Main Match Section -->
-                <div id="main-match" class="bg-gradient-to-br from-white/10 to-transparent border border-white/30 rounded-3xl p-8 mb-12">
-                    <!-- Dynamically populated by JS -->
+                <!-- Main Persona Section -->
+                <div id="main-persona" class="bg-gradient-to-br from-white/10 to-transparent border border-white/30 rounded-3xl p-8 mb-12">
+                    <!-- Dynamically populated -->
                 </div>
 
                 <!-- Breakdown -->
@@ -127,10 +127,8 @@
 
                 <!-- What your choices say about you -->
                 <div class="bg-white/5 border border-white/20 rounded-3xl p-8">
-                    <div class="uppercase text-xs text-amber-300 tracking-widest mb-4">What your choices say about you</div>
-                    <div id="choice-description" class="text-lg leading-relaxed space-y-6">
-                        <!-- JS populated -->
-                    </div>
+                    <div class="uppercase text-xs text-amber-300 tracking-widest mb-4">WHAT YOUR CHOICES SAY ABOUT YOU</div>
+                    <div id="choice-description" class="text-lg leading-relaxed"></div>
                 </div>
 
                 <div class="flex gap-4 mt-12">
@@ -224,27 +222,41 @@
         ]
 
         const factions = {
-            A: { 
-                name: "Constellation", 
-                emoji: "🔭", 
-                desc: "Curious scientists and explorers who prioritize discovery, knowledge, and pushing the boundaries of the unknown." 
+            A: { name: "Constellation", emoji: "🔭", short: "Constellation" },
+            B: { name: "United Colonies Vanguard", emoji: "🛡️", short: "UC Vanguard" },
+            C: { name: "Freestar Collective", emoji: "🤠", short: "Freestar Collective" },
+            D: { name: "Crimson Fleet", emoji: "🏴‍☠️", short: "Crimson Fleet" }
+        }
+
+        // Combination personas (as provided + logical mapping)
+        const combinations = {
+            "A+B": {
+                persona: "The Explorer-Soldier",
+                description: "You believe that humanity’s future in the stars must be protected by a steady hand. You aren't just out there for the science; you're the one making sure the frontier stays safe for everyone else. You value order, but only if it serves the greater mystery."
             },
-            B: { 
-                name: "United Colonies", 
-                emoji: "🛡️", 
-                desc: "Disciplined protectors who value law, order, structure, and the greater good of the Settled Systems." 
+            "A+C": {
+                persona: "The Lone Pioneer",
+                description: "You represent the true spirit of the frontier. To you, discovery is a personal right, not a government project. You’d rather map a new system in a beat-up hopper than a shiny military vessel. You seek the truth, but you want to find it on your own terms."
             },
-            C: { 
-                name: "Freestar Collective", 
-                emoji: "🤠", 
-                desc: "Independent frontier spirits who believe in freedom, self-reliance, and practical justice." 
+            "B+C": {
+                persona: "The Galactic Peacekeeper",
+                description: "You’ve found the impossible middle ground. You respect the need for local sovereignty but understand that without some form of unified protection, the Settled Systems would fall to chaos. You are the pragmatist who realizes that a badge and a uniform both mean the same thing: Duty."
             },
-            D: { 
-                name: "Crimson Fleet", 
-                emoji: "🏴‍☠️", 
-                desc: "Bold opportunists who thrive on risk, personal power, survival, and bending the rules for gain." 
+            "A+D": {
+                persona: "The Rogue Scholar",
+                description: "You follow the \"find-and-keep\" rule. You’re driven by an insatiable curiosity, but you have zero interest in following the laws of those who didn't do the work. To you, the artifacts and the loot are one and the same—valuable, rare, and rightfully yours."
+            },
+            "B+D": {
+                persona: "The Enforcer",
+                description: "You understand power better than anyone else. Whether you’re wearing a uniform or a pirate’s jacket, you know that might makes right. You likely have a \"results at any cost\" mentality, making you a dangerous ally and an even worse enemy."
+            },
+            "C+D": {
+                persona: "The Outlaw Hero",
+                description: "You are the ultimate individualist. You view the United Colonies as an overbearing parent and would rather live dangerously in the \"Wild West\" of space. You might break the law, but you have a personal code of honor that the bureaucrats in New Atlantis could never understand."
             }
         }
+
+        const neutralDescription = "You are a true neutral captain — balanced across all philosophies of the Settled Systems. No single faction fully defines you. You adapt to the situation, drawing from exploration, duty, freedom, and survival as needed. This flexibility makes you unpredictable, versatile, and dangerous in your own way. The galaxy is your playground, and you play by your own ever-changing rules."
 
         let currentIndex = 0
         let answersSelected = [] // 1=A, 2=B, 3=C, 4=D
@@ -279,7 +291,6 @@
                 `
                 div.onclick = () => {
                     answersSelected[currentIndex] = value
-                    
                     setTimeout(() => {
                         if (currentIndex < scenarios.length - 1) {
                             currentIndex++
@@ -319,102 +330,123 @@
             document.getElementById('results').classList.remove('hidden')
             
             const counts = getLetterCounts()
+            const sortedCounts = Object.entries(counts).sort((a, b) => b[1] - a[1])
             
             let mainHTML = ''
             let subtitle = ''
-            let shownFactions = []
+            let descriptionText = ''
             
-            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1])
-            const maxCount = sorted[0][1]
+            const maxCount = sortedCounts[0][1]
+            const secondCount = sortedCounts[1][1]
             
-            // Case 1: One faction > 4 times → single faction
-            if (maxCount > 4) {
-                const letter = sorted[0][0]
-                const f = factions[letter]
-                shownFactions = [letter]
+            // True neutral case: exactly 2 each
+            if (counts.A === 2 && counts.B === 2 && counts.C === 2 && counts.D === 2) {
                 mainHTML = `
-                    <div class="flex gap-8 items-start">
-                        <div class="text-8xl flex-shrink-0">${f.emoji}</div>
-                        <div class="flex-1">
-                            <div class="uppercase text-xs tracking-widest text-cyan-300 mb-1">YOUR PRIMARY FACTION</div>
-                            <div class="title-font text-5xl">${f.name} <span class="text-2xl font-normal text-white/70">(${counts[letter]} choices)</span></div>
-                            <div class="mt-6 text-lg text-white/80">${f.desc}</div>
-                        </div>
+                    <div class="text-center">
+                        <div class="text-7xl mb-6">🌌</div>
+                        <div class="title-font text-5xl mb-3">The True Neutral</div>
+                        <div class="text-cyan-300 text-xl">A Balanced Captain of the Settled Systems</div>
                     </div>
                 `
-                subtitle = `Your strong majority aligns with the <span class="font-semibold">${f.name}</span>`
-            } 
-            // Case 2: Perfect balance (2 each) → all four factions
-            else if (counts.A === 2 && counts.B === 2 && counts.C === 2 && counts.D === 2) {
-                shownFactions = ['A','B','C','D']
-                mainHTML = `
-                    <div class="text-center mb-6">
-                        <div class="text-6xl mb-4">🌌</div>
-                        <div class="title-font text-4xl mb-2">A True Blend Captain</div>
-                        <div class="text-cyan-300">You show equal affinity across all factions</div>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        ${Object.keys(factions).map(l => `
-                            <div class="bg-white/5 rounded-3xl p-6 text-center">
-                                <div class="text-6xl mb-3">${factions[l].emoji}</div>
-                                <div class="font-semibold">${factions[l].name}</div>
-                                <div class="text-xs text-white/60">2 choices</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `
-                subtitle = `You are a balanced blend of <span class="font-semibold">all four factions</span>`
-            } 
-            // Otherwise: Show top two factions
-            else {
-                const top1Letter = sorted[0][0]
-                const top2Letter = sorted[1][0]
-                const top1Count = counts[top1Letter]
-                const top2Count = counts[top2Letter]
+                subtitle = "Your choices show perfect balance across every faction"
+                descriptionText = neutralDescription
+            }
+            // One clear highest (more than all others)
+            else if (maxCount > secondCount) {
+                const topLetter = sortedCounts[0][0]
+                const f = factions[topLetter]
                 
-                if (top1Count > top2Count && top1Count >= 4) {
-                    // Clear lead (≥4) but not >4 → treat as primary
-                    const f = factions[top1Letter]
-                    shownFactions = [top1Letter]
+                // Check if there are two tied for second place
+                const seconds = sortedCounts.slice(1).filter(([_, c]) => c === secondCount)
+                const hasTiedSecond = seconds.length >= 2
+                
+                if (hasTiedSecond && seconds.length === 2) {
+                    // Report primary + two tied secondary motivations
+                    const sec1 = seconds[0][0]
+                    const sec2 = seconds[1][0]
+                    const comboKey = [topLetter, sec1].sort().join('+')
+                    const comboKey2 = [topLetter, sec2].sort().join('+')
+                    
+                    const combo = combinations[comboKey] || combinations[comboKey2]
+                    
+                    mainHTML = `
+                        <div class="flex gap-8 items-start">
+                            <div>
+                                <div class="text-8xl">${f.emoji}</div>
+                                <div class="mt-4 text-center">
+                                    <div class="font-medium">${f.name}</div>
+                                    <div class="text-xs text-white/60">Primary (${maxCount} choices)</div>
+                                </div>
+                            </div>
+                            <div class="flex-1 pt-6">
+                                <div class="uppercase text-xs tracking-widest text-amber-300 mb-2">Secondary Motivations</div>
+                                <div class="flex gap-4">
+                                    <div class="flex-1 bg-white/5 rounded-3xl p-5 text-center">
+                                        <div class="text-5xl mb-2">${factions[sec1].emoji}</div>
+                                        <div class="font-medium text-sm">${factions[sec1].short}</div>
+                                    </div>
+                                    <div class="flex-1 bg-white/5 rounded-3xl p-5 text-center">
+                                        <div class="text-5xl mb-2">${factions[sec2].emoji}</div>
+                                        <div class="font-medium text-sm">${factions[sec2].short}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                    subtitle = `Primary: ${f.name} • Secondary drives: ${factions[sec1].short} + ${factions[sec2].short}`
+                    descriptionText = combo ? combo.description : `You are driven primarily by ${f.name}, with strong secondary motivations from both ${factions[sec1].short} and ${factions[sec2].short}.`
+                } else {
+                    // Simple single primary
                     mainHTML = `
                         <div class="flex gap-8 items-start">
                             <div class="text-8xl flex-shrink-0">${f.emoji}</div>
                             <div class="flex-1">
                                 <div class="uppercase text-xs tracking-widest text-cyan-300 mb-1">YOUR PRIMARY FACTION</div>
-                                <div class="title-font text-5xl">${f.name} <span class="text-2xl font-normal text-white/70">(${top1Count} choices)</span></div>
-                                <div class="mt-6 text-lg text-white/80">${f.desc}</div>
+                                <div class="title-font text-5xl">${f.name} <span class="text-2xl font-normal text-white/70">(${maxCount} choices)</span></div>
                             </div>
                         </div>
                     `
-                    subtitle = `Your choices lean clearly toward the <span class="font-semibold">${f.name}</span>`
-                } else {
-                    // Standard top-two blend
-                    const f1 = factions[top1Letter]
-                    const f2 = factions[top2Letter]
-                    shownFactions = [top1Letter, top2Letter]
-                    mainHTML = `
-                        <div class="flex flex-col md:flex-row gap-8">
-                            <div class="flex-1 bg-white/5 rounded-3xl p-6">
-                                <div class="text-7xl mb-3">${f1.emoji}</div>
-                                <div class="title-font text-4xl">${f1.name}</div>
-                                <div class="text-sm text-white/60 mt-1">(${top1Count} choices)</div>
-                                <div class="mt-6 text-white/80">${f1.desc}</div>
+                    subtitle = `Your choices clearly align with the ${f.name}`
+                    descriptionText = `You are strongly motivated by the values of the ${f.name}.`
+                }
+            }
+            // Tie for highest
+            else {
+                const tiedLetters = sortedCounts.filter(([_, c]) => c === maxCount).map(([l]) => l)
+                if (tiedLetters.length === 2) {
+                    const l1 = tiedLetters[0]
+                    const l2 = tiedLetters[1]
+                    const comboKey = [l1, l2].sort().join('+')
+                    const combo = combinations[comboKey]
+                    
+                    if (combo) {
+                        mainHTML = `
+                            <div class="flex flex-col md:flex-row gap-8">
+                                <div class="flex-1 text-center">
+                                    <div class="text-7xl mb-3">${factions[l1].emoji}</div>
+                                    <div class="font-semibold">${factions[l1].name}</div>
+                                </div>
+                                <div class="flex-1 text-center">
+                                    <div class="text-7xl mb-3">${factions[l2].emoji}</div>
+                                    <div class="font-semibold">${factions[l2].name}</div>
+                                </div>
                             </div>
-                            <div class="flex-1 bg-white/5 rounded-3xl p-6">
-                                <div class="text-7xl mb-3">${f2.emoji}</div>
-                                <div class="title-font text-4xl">${f2.name}</div>
-                                <div class="text-sm text-white/60 mt-1">(${top2Count} choices)</div>
-                                <div class="mt-6 text-white/80">${f2.desc}</div>
+                            <div class="text-center mt-8">
+                                <div class="inline-block bg-gradient-to-r from-cyan-400 to-purple-500 text-black font-bold px-8 py-3 rounded-3xl text-xl">${combo.persona}</div>
                             </div>
-                        </div>
-                        <div class="mt-6 text-center text-cyan-300 text-sm">Strong blend between these two factions</div>
-                    `
-                    subtitle = `Your pattern shows a blend of <span class="font-semibold">${f1.name}</span> and <span class="font-semibold">${f2.name}</span>`
+                        `
+                        subtitle = `Tied between ${factions[l1].name} and ${factions[l2].name}`
+                        descriptionText = combo.description
+                    } else {
+                        // Fallback
+                        descriptionText = `Your choices are evenly split between ${factions[l1].name} and ${factions[l2].name}.`
+                    }
                 }
             }
             
-            document.getElementById('main-match').innerHTML = mainHTML
+            document.getElementById('main-persona').innerHTML = mainHTML
             document.getElementById('result-subtitle').innerHTML = subtitle
+            document.getElementById('choice-description').innerHTML = descriptionText || "Your pattern reveals a unique mix of motivations across the Settled Systems."
             
             // Breakdown
             const breakdownHTML = Object.keys(counts).map(letter => `
@@ -425,22 +457,6 @@
                 </div>
             `).join('')
             document.getElementById('breakdown').innerHTML = breakdownHTML
-            
-            // Descriptions for shown factions
-            let descHTML = ''
-            shownFactions.forEach(letter => {
-                const f = factions[letter]
-                descHTML += `
-                    <div class="flex gap-5 items-start">
-                        <div class="text-5xl flex-shrink-0 mt-1">${f.emoji}</div>
-                        <div>
-                            <div class="font-semibold text-xl mb-1">${f.name}</div>
-                            <div class="text-white/80">${f.desc}</div>
-                        </div>
-                    </div>
-                `
-            })
-            document.getElementById('choice-description').innerHTML = descHTML
         }
 
         function restartQuiz() {
@@ -448,7 +464,7 @@
             document.getElementById('intro').classList.remove('hidden')
         }
 
-        console.log("%cStarfield Faction Quiz updated – Average Score section removed", "color:#67e8f9; font-family:monospace")
+        console.log("%cStarfield Faction Quiz – Updated with new persona logic (clear winner, tied seconds, highest tie combinations, true neutral)", "color:#67e8f9; font-family:monospace")
     </script>
 </body>
 </html>
